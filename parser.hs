@@ -11,7 +11,7 @@ import qualified Data.ByteString.Lazy.Char8 as BSL
 data KindleCollections = KindleCollections Collection deriving (Show)
 data Collection = Collection [String] Integer deriving (Show)
 
-test_file = "kindle_collection_short.json"
+test_file = "input/kindle_collection_short.json"
 -- test_file = "collection.json"
 
 main ::IO ()
