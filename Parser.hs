@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-} 
+module Parser where
 
 import Control.Applicative ((<$>), (<*>))
 import Control.Monad (mzero)
@@ -9,29 +10,28 @@ import qualified Data.ByteString.Char8 as BS
 import qualified Data.ByteString.Lazy.Char8 as BSL
 import Data.Map as M
 import Data.Text (Text(..))
-data KindleCollections = KindleCollections [Collection] deriving (Show)
-data Collection = Collection [String] Integer deriving (Show)
+
+type CollMap = Map Text Collection
+data KindleCollections = KindleCollections CollMap deriving (Show)
+data Collection = Collection [Text] Integer deriving (Show)
 
 test_file = "input/kindle_collection_short.json"
--- test_file = "collection.json"
 
 main ::IO ()
 main = do 
   (fmap parseFromString $ readFile test_file) >>= print
   result <- (fmap parseFromString $ readFile test_file)
   case result of
-    Success kc -> putStrLn $ BSL.unpack $ encode kc
+    Success kc -> putStrLn "" -- $ BSL.unpack $ encode kc
     Error e -> putStrLn $ "err " ++ show e
 
+parseCollectionsJSON :: FilePath -> IO (T.Result KindleCollections)
+parseCollectionsJSON p = do
+  fmap parseFromString (readFile p)
 
 instance FromJSON KindleCollections where
-  parseJSON (Object v) = do
-    let ks = M.keys v
-    xs <- mapM (v .: ) ks
-    return $ KindleCollections xs
+  parseJSON ob@(Object v) = KindleCollections <$> parseJSON ob
   parseJSON _          = mzero
-
-pick v k = v .: k
 
 instance FromJSON Collection where
   parseJSON (Object v) = Collection <$>
