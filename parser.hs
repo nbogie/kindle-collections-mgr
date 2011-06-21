@@ -7,8 +7,9 @@ import qualified Data.Aeson.Types as T
 import Data.Attoparsec (parse, Result(..))
 import qualified Data.ByteString.Char8 as BS
 import qualified Data.ByteString.Lazy.Char8 as BSL
-
-data KindleCollections = KindleCollections Collection deriving (Show)
+import Data.Map as M
+import Data.Text (Text(..))
+data KindleCollections = KindleCollections [Collection] deriving (Show)
 data Collection = Collection [String] Integer deriving (Show)
 
 test_file = "input/kindle_collection_short.json"
@@ -17,12 +18,20 @@ test_file = "input/kindle_collection_short.json"
 main ::IO ()
 main = do 
   (fmap parseFromString $ readFile test_file) >>= print
+  result <- (fmap parseFromString $ readFile test_file)
+  case result of
+    Success kc -> putStrLn $ BSL.unpack $ encode kc
+    Error e -> putStrLn $ "err " ++ show e
 
 
 instance FromJSON KindleCollections where
-  parseJSON (Object v) = KindleCollections <$>
-                          v .: "foo"
+  parseJSON (Object v) = do
+    let ks = M.keys v
+    xs <- mapM (v .: ) ks
+    return $ KindleCollections xs
   parseJSON _          = mzero
+
+pick v k = v .: k
 
 instance FromJSON Collection where
   parseJSON (Object v) = Collection <$>
