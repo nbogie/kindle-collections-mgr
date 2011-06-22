@@ -1,6 +1,7 @@
 import SHAUtils (makeSHA1Digest)
-import Parser hiding (main)
-import FileUtils (makeHashForFile, collectDocs, makeKFile, getKFilesFrom)
+import KJSON hiding (main)
+import FileUtils (makeHashForFile, collectDocs, 
+                  makeKFile, getKFilesFrom)
 import Types
 
 import Data.Aeson
@@ -20,7 +21,8 @@ main = do
 
 processContents root = do
   let collPath = root ++ "system/collections.json"
-  Success kcoll <- parseCollectionsJSON collPath -- TODO: handle json parse fail
+  -- TODO: handle json parse fail
+  Success kcoll <- parseCollectionsJSON collPath
   print kcoll
   kfiles <- getKFilesFrom root
   print $ annotateAll kfiles kcoll

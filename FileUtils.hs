@@ -1,7 +1,7 @@
 module FileUtils (collectDocs, makeHashForFile, makeKFile, getKFilesFrom) where
 
 import SHAUtils (makeSHA1Digest)
-import Parser hiding (main)
+import KJSON hiding (main)
 import Types
 
 import Data.Aeson

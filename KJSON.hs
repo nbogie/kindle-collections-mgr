@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-} 
-module Parser where
+module KJSON where
 
 import Control.Applicative ((<$>), (<*>))
 import Control.Monad (mzero)
@@ -47,8 +47,9 @@ instance ToJSON KindleCollections where
   toJSON (KindleCollections foo) = toJSON foo
 
 instance ToJSON Collection where
-  toJSON (Collection items lastAccess) = object [  "items" .= (map star items)
-                                                 , "lastAccess" .= lastAccess ]
+  toJSON (Collection items lastAccess) = 
+    object [  "items" .= (map star items)
+            , "lastAccess" .= lastAccess ]
     where 
       star h = X.pack $ starStr (X.unpack h)
       starStr h@('*':_) = h
@@ -61,6 +62,9 @@ parseFromString s =
   let bs = BS.pack s
   in case parse json bs of
        Done _rest result -> T.parse parseJSON result
-       Fail rest ctxts err -> Error $ "JSON parse error: " ++ err ++ ", contexts: " ++ show ctxts  ++ ", rest: " ++ BS.unpack rest
-       Partial _           -> Error "JSON parse error.  Unexpected partial."
+       Fail rest ctxts err -> 
+         Error $ "JSON parse error: " ++ err ++ ", contexts: " 
+                 ++ show ctxts  ++ ", rest: " ++ BS.unpack rest
+       Partial _           -> 
+         Error "JSON parse error.  Unexpected partial."
 

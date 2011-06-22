@@ -3,7 +3,7 @@ import Graphics.UI.Gtk
 import Graphics.UI.Gtk.Glade
 import FileUtils
 import Types
-import Parser (encodeToString, parseCollectionsJSON)
+import KJSON (encodeToString, parseCollectionsJSON)
 import Data.List (isInfixOf)
 import Data.Char (toUpper)
 import Data.Text (pack)
@@ -12,8 +12,18 @@ import Data.Aeson.Types (Result(..))
 import Data.IORef
 import qualified Text.Show.Pretty as Pr
 
+import System.Environment (getArgs)
+
+usage :: String
+usage = "prog path_to_kindle_collections.json"
+
 main :: FilePath -> IO ()
 main fpath = do 
+  let testCollPath = "/media/Kindle/system/collections.json"
+  args <- getArgs
+  let collPath = case args of
+                  [p] -> p
+                  _   -> error usage
   
   putStrLn $ "Will read ui from " ++ fpath
   initGUI
@@ -27,7 +37,6 @@ main fpath = do
   entrySearch    <-  xmlGetWidget  xml  castToEntry     "entrySearch"
   entryCollName  <-  xmlGetWidget  xml  castToEntry     "entryCollectionName"
 
-  let collPath = "/media/Kindle/system/collections.json"
   Success kcoll <- parseCollectionsJSON collPath -- TODO: handle json parse fail
   kref <- newIORef kcoll
 

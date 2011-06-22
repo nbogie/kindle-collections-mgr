@@ -46,7 +46,8 @@ createCollection :: KindleCollections -> Text -> KindleCollections
 createCollection kc@(KindleCollections cmap) cname =
   case M.lookup cname cmap of
     Just existing -> kc
-    Nothing -> KindleCollections $ M.insert cname (Collection [] neverTime) cmap
+    Nothing -> 
+      KindleCollections $ M.insert cname (Collection [] neverTime) cmap
 
 neverTime = 0 -- jan 1970
 
@@ -73,5 +74,6 @@ annotateHash files h =
     Nothing -> (h, Nothing)
 
 match :: KHash -> KFile -> Bool
-match givenHash (KFile path khash) = "*" ++(unpack khash) == unpack givenHash
+match givenHash (KFile path khash) = 
+  "*" ++(unpack khash) == unpack givenHash
 
