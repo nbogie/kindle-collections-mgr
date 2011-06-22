@@ -8,8 +8,8 @@ import qualified Data.Aeson.Types as T
 import Data.Attoparsec (parse, Result(..))
 import qualified Data.ByteString.Char8 as BS
 import qualified Data.ByteString.Lazy.Char8 as BSL
-import Data.Map as M
-import Data.Text (Text(..))
+import qualified Data.Map as M
+import qualified Data.Text as X
 
 import Types
 
@@ -47,8 +47,11 @@ instance ToJSON KindleCollections where
   toJSON (KindleCollections foo) = toJSON foo
 
 instance ToJSON Collection where
-  toJSON (Collection items lastAccess) = object [  "items" .= items 
+  toJSON (Collection items lastAccess) = object [  "items" .= (map star items)
                                                  , "lastAccess" .= lastAccess ]
+    where 
+      star h = X.pack ('*': X.unpack h)
+
 
 parseFromString :: String -> T.Result KindleCollections
 parseFromString s = 
