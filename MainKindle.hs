@@ -85,5 +85,5 @@ usage = "prog path_to_kindle_docs"
 test = do
   fs <- mapM makeKFile ["fiction/foo.pdf", "science/bar.mobi"]
   let k = createCollection newCollection (pack "fiction")
-  let k' = addTo fs (pack "zombies") k
-  return k'
+  let k' = addTo fs (pack "science") k
+  putStrLn $ encodeToString k'
