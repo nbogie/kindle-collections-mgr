@@ -1,6 +1,7 @@
 import SHAUtils (makeSHA1Digest)
 import Parser hiding (main)
-import FileUtils
+import FileUtils (makeHashForFile, collectDocs, makeKFile)
+import Types
 
 import Data.Aeson
 import qualified Data.Aeson.Types as T
@@ -17,10 +18,6 @@ main = do
       [root] -> processContents root
       _      -> error usage
   return ()
-data AnnotCollection = AnnotCollection Text [(KHash, Maybe FilePath)] Integer deriving (Show)
-
-type KHash = Text
-data KFile = KFile String KHash deriving (Show)
 
 processContents root = do
   let collPath = root ++ "system/collections.json"
@@ -32,10 +29,37 @@ processContents root = do
   print $ annotateAll kfiles kcoll
   -- mapM (showInColls kcoll) digests
 
+newCollection :: KindleCollections
+newCollection = KindleCollections M.empty
+
+-- will add a new collection if one doesn't already exist
+addTo :: [KFile] -> Text  -> KindleCollections -> KindleCollections
+addTo fs cname (KindleCollections cmap) = 
+  KindleCollections newMap
+    where 
+      newMap :: CollMap
+      newMap = M.insert cname newColl cmap
+      newColl = addToCollection c newHashes
+      c = case M.lookup cname cmap of
+        Just coll -> coll
+        Nothing   -> Collection [] neverTime
+      newHashes = map getH fs
+      getH (KFile p h) = h
+
+createCollection :: KindleCollections -> Text -> KindleCollections
+createCollection kc@(KindleCollections cmap) cname =
+  case M.lookup cname cmap of
+    Just existing -> kc
+    Nothing -> KindleCollections $ M.insert cname (Collection [] neverTime) cmap
+
+neverTime = 0 -- jan 1970
+
+addToCollection :: Collection -> [KHash] -> Collection
+addToCollection (Collection hs la) hsNew = Collection (hs ++ hsNew) la
+
 showInColls :: KindleCollections -> String -> IO ()
 showInColls kcolls sought = do
   putStrLn $ "Seeking " ++ show sought
-
 
 annotateAll :: [KFile] -> KindleCollections -> [AnnotCollection]
 annotateAll files (KindleCollections cs) = 
@@ -57,3 +81,9 @@ match givenHash (KFile path khash) = "*" ++(unpack khash) == unpack givenHash
 
 usage :: String
 usage = "prog path_to_kindle_docs"
+
+test = do
+  fs <- mapM makeKFile ["fiction/foo.pdf", "science/bar.mobi"]
+  let k = createCollection newCollection (pack "fiction")
+  let k' = addTo fs (pack "zombies") k
+  return k'

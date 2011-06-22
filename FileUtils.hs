@@ -1,7 +1,8 @@
-module FileUtils (collectDocs, makeHashForFile) where
+module FileUtils (collectDocs, makeHashForFile, makeKFile) where
 
 import SHAUtils (makeSHA1Digest)
 import Parser hiding (main)
+import Types
 
 import Data.Aeson
 import qualified Data.ByteString.Lazy.Char8 as BSL
@@ -13,6 +14,11 @@ import Control.Monad
 import qualified Data.Text  as T
 debug :: String -> IO ()
 debug s = return () -- putStrLn s
+
+makeKFile :: FilePath -> IO KFile
+makeKFile p = do
+  h <- makeHashForFile p
+  return $ KFile p h
 
 makeHashForFile :: FilePath -> IO T.Text
 makeHashForFile p = do

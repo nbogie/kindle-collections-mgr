@@ -11,19 +11,24 @@ import qualified Data.ByteString.Lazy.Char8 as BSL
 import Data.Map as M
 import Data.Text (Text(..))
 
-type CollMap = Map Text Collection
-data KindleCollections = KindleCollections CollMap deriving (Show)
-data Collection = Collection [Text] Integer deriving (Show)
+import Types
 
 test_file = "input/kindle_collection_short.json"
+-- test_file = "input/gen.json"
+
+encodeToString = BSL.unpack . encode
 
 main ::IO ()
 main = do 
-  (fmap parseFromString $ readFile test_file) >>= print
   result <- (fmap parseFromString $ readFile test_file)
   case result of
-    Success kc -> putStrLn "" -- $ BSL.unpack $ encode kc
-    Error e -> putStrLn $ "err " ++ show e
+    Success kc -> do
+      let generated = encodeToString kc
+      putStrLn generated 
+      case parseFromString generated of
+        Success kAgain -> putStrLn "Reparsed generated json ok."
+        Error e -> error $ "Couldn't parse generated json" ++ e
+    Error e -> error $ "Error parsing read json: " ++ e
 
 parseCollectionsJSON :: FilePath -> IO (T.Result KindleCollections)
 parseCollectionsJSON p = do
@@ -39,10 +44,11 @@ instance FromJSON Collection where
   parseJSON _          = mzero
 
 instance ToJSON KindleCollections where
-  toJSON (KindleCollections foo) = object ["x" .= foo]
+  toJSON (KindleCollections foo) = toJSON foo
 
 instance ToJSON Collection where
-  toJSON (Collection items lastAccess) = object ["items" .= items]
+  toJSON (Collection items lastAccess) = object [  "items" .= items 
+                                                 , "lastAccess" .= lastAccess ]
 
 parseFromString :: String -> T.Result KindleCollections
 parseFromString s = 
