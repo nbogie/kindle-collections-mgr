@@ -50,7 +50,10 @@ instance ToJSON Collection where
   toJSON (Collection items lastAccess) = object [  "items" .= (map star items)
                                                  , "lastAccess" .= lastAccess ]
     where 
-      star h = X.pack ('*': X.unpack h)
+      star h = X.pack $ starStr (X.unpack h)
+      starStr h@('*':_) = h
+      starStr h@('#':_) = h
+      starStr h         = '*':h
 
 
 parseFromString :: String -> T.Result KindleCollections

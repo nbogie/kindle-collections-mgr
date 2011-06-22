@@ -1,4 +1,4 @@
-module FileUtils (collectDocs, makeHashForFile, makeKFile) where
+module FileUtils (collectDocs, makeHashForFile, makeKFile, getKFilesFrom) where
 
 import SHAUtils (makeSHA1Digest)
 import Parser hiding (main)
@@ -14,6 +14,12 @@ import Control.Monad
 import qualified Data.Text  as T
 debug :: String -> IO ()
 debug s = return () -- putStrLn s
+
+getKFilesFrom :: FilePath -> IO [KFile]
+getKFilesFrom root = do
+  docs <- collectDocs $ root ++ "documents"
+  digests <- mapM makeHashForFile docs
+  return $ (zipWith KFile) docs digests
 
 makeKFile :: FilePath -> IO KFile
 makeKFile p = do
