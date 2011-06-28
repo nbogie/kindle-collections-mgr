@@ -48,16 +48,18 @@ Cabal-version:       >=1.6
 Executable kindle-collection-mgr
   -- .hs or .lhs file containing the Main module.
   Main-is:             GUIMain.hs
+  Hs-Source-Dirs:      src 
   
   -- Packages needed in order to build this package.
   Build-depends:       
     base         ==  4.2.0.0,
-    directory    ==  1.1.0.0,
+    directory    ==  1.0.1.0,
     filepath     ==  1.1.0.3,
     hopenssl     ==  1.6.1,
     glade        ==  0.12.0,
     gtk          ==  0.12.0,
     bytestring   ==  0.9.1.7,
+    containers   ==  0.3.0.0,
     cmdargs      ==  0.6.*,
     aeson        ==  0.3.2.6,
     attoparsec   >=  0.8.6.1,
