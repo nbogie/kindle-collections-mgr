@@ -1,3 +1,5 @@
 input/sensitive
 *.swp
 GUIMain
+dist
+printable/
